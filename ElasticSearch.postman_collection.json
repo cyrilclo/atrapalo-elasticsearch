@@ -1,0 +1,260 @@
+{
+	"variables": [],
+	"info": {
+		"name": "ElasticSearch",
+		"_postman_id": "22d5b59c-3e68-c217-1dda-5c8a6acba279",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Set cluster settings",
+			"request": {
+				"url": "localhost:9200/_cluster/settings",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"transient\": {\n\t\t\"cluster.routing.allocation.disk.watermark.flood_stage\":\"1gb\", \n\t\t\"cluster.routing.allocation.disk.watermark.low\": \"2gb\", \n\t\t\"cluster.routing.allocation.disk.watermark.high\": \"1gb\"\n\t\t\n\t}\n}\t"
+				},
+				"description": "Set Watermark"
+			},
+			"response": []
+		},
+		{
+			"name": "Create Person Index",
+			"request": {
+				"url": "http://localhost:9200/person",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"settings\" : {\n        \"index\" : {\n            \"number_of_shards\" : 3, \n            \"number_of_replicas\" : 2 \n        }\n  },\n  \"mappings\": {\n    \"doc\": {\n      \"properties\": { \n        \"first_name\": { \"type\": \"text\" },\n        \"last_name\": { \"type\": \"text\" },\n        \"email\": { \"type\": \"keyword\" },\n        \"created_at\": { \"type\": \"date\", \"format\": \"yyyy-MM-dd HH:mm:ss\" },\n        \"description\": { \"type\": \"text\", \"analyzer\": \"english\" },\n        \"age\": { \"type\": \"short\" },\n        \"favorite_football_club\": { \"type\": \"keyword\" }\n      }\n    }\n  }\n}\n\n"
+				},
+				"description": "Create mapping"
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Index",
+			"request": {
+				"url": "http://localhost:9200/person/",
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Create Person Document",
+			"request": {
+				"url": "http://localhost:9200/person/doc",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"first_name\": \"John\",\n\t\"last_name\": \"Doe\",\n\t\"email\": \"john.doe@lycos.com\",\n\t\"age\": 55,\n\t\"descrpiton\": \"Hello I'm Jordi I love find new restaurants and traveling\",\n\t\"sports\": [\"football\", \"ping-pong\"],\n\t\"favorite_football_club\": \"F.C Barcelona\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Update Person Document",
+			"request": {
+				"url": "http://localhost:9200/person/doc/1",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"first_name\": \"John\",\n\t\"last_name\": \"Doe\",\n\t\"age\": 35,\n\t\"descrpiton\": \"Hello I'm John Doe...\",\n\t\"sports\": [\"football\", \"ping-pong\"],\n\t\"favorite_football_club\": \"F.C Barcelona\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Search Lite",
+			"request": {
+				"url": {
+					"raw": "http://localhost:9200/person/doc/_search?q=first_name:Jose",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9200",
+					"path": [
+						"person",
+						"doc",
+						"_search"
+					],
+					"query": [
+						{
+							"key": "q",
+							"value": "first_name:Jose",
+							"equals": true,
+							"description": ""
+						}
+					],
+					"variable": []
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Search Person - match on text field",
+			"request": {
+				"url": "http://localhost:9200/person/doc/_search",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"query\": {\n    \"match\": {\n      \"first_name\": \"Jose\"\n    }\n  }\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Search Person - find exact term",
+			"request": {
+				"url": "http://localhost:9200/person/doc/_search",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"query\": {\n    \"term\": {\n      \"last_name\": \"Orear\"\n    }\n  }\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Search - Range filter",
+			"request": {
+				"url": "http://localhost:9200/person/doc/_search",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"sort\" : [\n\t    { \"age\" : \"desc\" },\n\t    { \"created_at\" : \"desc\" }\n    ],\n    \"query\": {\n        \"range\" : {\n            \"age\" : {\n            \t\"lt\": 40, \"gt\": 20\n            }\n        }\n    }\n}\n"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "MGET query",
+			"request": {
+				"url": "http://localhost:9200/person/doc/_mget",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"docs\" : [\n        {\n            \"_id\" : \"zq0wmmEBG9zUQRqElg4l\"\n        },\n        {\n            \"_id\" : \"z60wmmEBG9zUQRqElw5h\"\n        }\n    ]\n}\n"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "BULK operations",
+			"request": {
+				"url": "http://localhost:9200/person/doc/_bulk",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-ndjson",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \"index\":{ \"_index\": \"person\", \"_type\": \"doc\" } }\n{\"first_name\": \"John\", \"last_name\": \"Doe\", \"email\": \"john.doe@lycos.com\", \"age\": 55, \"sports\": [\"football\"]}\n{\"index\":{}}\n{\"first_name\": \"Johna\", \"last_name\": \"Doe\", \"email\": \"johna.doe@lycos.com\", \"age\": 56, \"sports\": [\"tennis\"]}\n{ \"delete\" : { \"_index\" : \"person\", \"_type\" : \"doc\", \"_id\" : \"z60wmmEBG9zUQRqElw5h\" } }\n{ \"update\" : {\"_id\" : \"1q0wmmEBG9zUQRqEmw58\", \"_type\" : \"doc\", \"_index\" : \"person\"} }\n{ \"doc\" : {\"favorite_football_club\" : \"Bordeaux\"} }\n"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Search - Complexe filter",
+			"request": {
+				"url": "http://localhost:9200/person/doc/_search",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"from\" : 0,\n\t\"size\" : 10,\n\t\"query\": {\n\t\t\"bool\": {\n\t\t\t\"must\": [\n\t\t\t\t{\"term\" : {\"favorite_football_club\": \"Paris Saint Germain\"}},\n\t\t\t\t{\"range\" : {\n\t\t            \"age\" : {\n\t\t            \t\"lt\": 50, \"gt\": 20\n\t\t            }\n\t\t        }}\n\t\t\t],\n\t\t\t\"must_not\": [\n\t\t\t\t{\"match\": {\"sports\": \"Shooting\"}}\n\t\t\t],\n\t\t\t\"should\": [\n\t\t\t\t{\"match\": {\"sports\": \"Handball\"}}\n\t\t\t]\n\t\t}\n\t}\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}
